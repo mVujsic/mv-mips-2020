@@ -2,13 +2,19 @@
 <h3 align="center"> Aутор: Матеја Вујсић 617/2017</h3>
 
 ### Oпис: Први домаћи задатак
+<div align="center" markdown="1">
+
 - [x] Блокови,три реда, у траженој боји,
 - [ ] Платформа, у траженој боји,
 - [ ] Kретање платформе на тастере,
 - [x] Физика и логика лоптице,
 - [x] Разбијање и уништавање,
 - [ ] Заустављање.
-<details><summary><h3 align="left">Потребно инсталирати следеће:</h3></summary>
+
+</div>
+<hr>
+<details>
+<summary><h3 align="left">Неопходно:</h3></summary>
 <ul>
 <li>DosBox - x86 емулатор за ОС који нативно не покрећу DOS програме. https://www.dosbox.com/ </li>
 <li>Masm/Tasm -DOS компајлери за assembly програме.</li>
@@ -16,7 +22,7 @@
 </ul>
 </details>
 
-<details><summary><h3>Покретање програма:</h3></summary>
+<details><summary><h3>Покретање:</h3></summary>
 <div markodown="1">
   
 - **сместити .аsm фајл репоа у фолдер са изнад наведеним (2) (3).**
@@ -31,5 +37,6 @@ link <име>.OBJ
 ```
 </div>
 </details>
+<hr>
 
 ### Изглед програма
