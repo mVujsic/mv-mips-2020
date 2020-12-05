@@ -14,7 +14,7 @@
 </div>
 <hr>
 <details>
-<summary><h3 align="left">Неопходно:</h3></summary>
+<summary>Неопходно:</summary>
 <ul>
 <li>DosBox - x86 емулатор за ОС који нативно не покрећу DOS програме. https://www.dosbox.com/ </li>
 <li>Masm/Tasm -DOS компајлери за assembly програме.</li>
@@ -22,7 +22,7 @@
 </ul>
 </details>
 
-<details><summary><h3>Покретање:</h3></summary>
+<details><summary>Покретање:</summary>
 <div markodown="1">
   
 - **сместити .аsm фајл репоа у фолдер са изнад наведеним (2) (3).**
