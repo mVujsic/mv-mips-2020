@@ -961,7 +961,8 @@ kraj:   MOV ax, 4c00h
 		MOV bh, 00h
 		INT 10h; exit
         INT 21h
-		
-cseg     ends
 
 end iscrtaj
+
+cseg     ends
+
