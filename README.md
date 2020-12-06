@@ -14,7 +14,6 @@
 - [x] Промена боје лоптице на сваки ударац о зид.
 
 </div>
-<hr>
 <details>
 <summary>Неопходно:</summary>
 <ul>
@@ -39,13 +38,10 @@ link <име>.OBJ
 ```
 </div>
 </details>
-<hr>
 
 ### Изглед програма
-<div>
-<img src="https://github.com/mVujsic/mv-mips-2020/blob/master/snaps/gameplay.png"
-     alt="Gameplay"
-     align="center" />
+<div align="center">
+<h1 align="center"><img src="https://github.com/mVujsic/mv-mips-2020/blob/master/snaps/gameplay.png" alt="Gameplay" /></h1>
 </div>
 
 
