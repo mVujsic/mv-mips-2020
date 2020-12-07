@@ -11,58 +11,52 @@ sseg ends
 
 dseg segment 'DATA'
 
-	;TODO
-	BROJ_BLOKOVA DB 0Ch;
-
 	VREME_PROTEKLO DB 0 ; vremenska promenljiva 
-	
-	LOPTICA_X DW 0h ; ; INIT
-	LOPTICA_Y DW 70h ; 
+	LOPTICA_X DW 0h 
+	LOPTICA_Y DW 70h ;
 	VELICINA_LOPTICE DW 03h ; velicina lopte 
 	BRZINA_LOPTICE_PO_X DW 5h ; horizontalna brzine
 	BRZINA_LOPTICE_PO_Y DW 2h ; vertikalna  brzine
-	BOJA_LOPTICE DW 1h ; POCETNA BOJA LOPTICE
-	
-	BRZINA_PLATFORME DW 07h; brzina platforme
+	BOJA_LOPTICE DW 1h 
 
-    BLOK_X DW 080h ; x pozicija  bloka INIT
-    BLOK_Y DW 0BEh ; y pozicija  bloka INIT
+	;******************************blokovi
+	BLOK_KOLONA1 DW 10h
+	BLOK_KOLONA2 DW 5Fh
+	BLOK_KOLONA3 DW 0A9h
+	BLOK_KOLONA4 DW 0F8h
 	
-	BLOK_X_1 DW 14h ; INIT  const za svaki red blokova
-	BLOK_X_2 DW 5Fh
-	BLOK_X_3 DW 0AAh
-	BLOK_X_4 DW 0F5h
+	BLOK_RED1 DW 0Ah
+	BLOK_RED2 DW 1Fh
+	BLOK_RED3 DW 36h
 	
-	BLOK_Y_1 DW 0Ah
-	BLOK_Y_2 DW 19h
-	BLOK_Y_3 DW 28h
+	SIRINA_BLOKOVA DW 37h
+	VISINA_BLOKOVA DW 0Ah
 	
-    VELICINA_BLOKA_X DW 50h ; sirina
- 	VELICINA_BLOKA_Y DW 0Ah ; visina 
+	SUDAR_BLOK11 DW 1h
+	SUDAR_BLOK12 DW 1h
+	SUDAR_BLOK13 DW 1h
+	SUDAR_BLOK14 DW 1h
+	SUDAR_BLOK21 DW 1h
+	SUDAR_BLOK22 DW 1h
+	SUDAR_BLOK23 DW 1h
+	SUDAR_BLOK24 DW 1h
+	SUDAR_BLOK31 DW 1h
+	SUDAR_BLOK32 DW 1h
+	SUDAR_BLOK33 DW 1h
+	SUDAR_BLOK34 DW 1h
 	
-	VELICINA_BLOKA_X_1 DW 37h
-	VELICINA_BLOKA_Y_1 DW 0Ah
+	
+	;*****************************platforma 
+	PLATFORMA_X DW 080h 
+    PLATFORMA_y DW 0BDh 
+	SIRINA_PLATFORME DW 55h 
+ 	VISINA_PLATFORME DW 0Ah 
 	
 	;PARAMETERI ZA VELICNIU PROZORA I RANU KOLIZIJU 
-    WINDOW_WIDTH DW 140h   
-    WINDOW_HEIGHT DW 0C8h  
+    WINDOW_WIDTH DW 140h   ;320
+    WINDOW_HEIGHT DW 0C8h  ;200
 	WINDOW_BOUNDS DW 0     
-    
-	DESTRUKTOR_BLOKA_1_1 DW 1h
-	DESTRUKTOR_BLOKA_1_2 DW 1h
-	DESTRUKTOR_BLOKA_1_3 DW 1h
-	DESTRUKTOR_BLOKA_1_4 DW 1h
-	DESTRUKTOR_BLOKA_2_1 DW 1h
-	DESTRUKTOR_BLOKA_2_2 DW 1h
-	DESTRUKTOR_BLOKA_2_3 DW 1h
-	DESTRUKTOR_BLOKA_2_4 DW 1h
-	DESTRUKTOR_BLOKA_3_1 DW 1h
-	DESTRUKTOR_BLOKA_3_2 DW 1h
-	DESTRUKTOR_BLOKA_3_3 DW 1h
-	DESTRUKTOR_BLOKA_3_4 DW 1h
 	
-	
-
 dseg ends
 
 cseg segment 'CODE'
@@ -88,7 +82,7 @@ cseg segment 'CODE'
 		MOV VREME_PROTEKLO,dl ; azuriraj vreme
 		
 		CALL OBRISI_EKRAN ; obrisi sadrzaj ekrana
-		CALL POMJERI_LOPTU ; pomeri loptu
+		CALL POMERI_LOPTU ; pomeri loptu
 		CALL NACTAJ_JE  ; ucrtaj  JE
 		CALL POMERI_PLATFORMU;
 		CALL ISCRTAJ_PLATFORMU ;ucrtaj platformu  
@@ -110,7 +104,7 @@ cseg segment 'CODE'
 	JMP kraj
 	
 	
-	POMJERI_LOPTU PROC NEAR
+	POMERI_LOPTU PROC NEAR
 		
 		MOV ax,BRZINA_LOPTICE_PO_X    
 		add LOPTICA_X,ax             
@@ -136,15 +130,15 @@ cseg segment 'CODE'
 		
 		MOV ax,WINDOW_BOUNDS
 		CMP LOPTICA_Y,ax   		;LOPTICA_Y < 0 + WINDOW_BOUNDS (sudar - gornja ivica)
-		jg ddd  
+		jg dalje  
 		CALL NEG_VELOCITY_Y                          
 		MOV BOJA_LOPTICE, 4h
 		
-		ddd:
+		dalje:
 		
 		MOV ax,WINDOW_HEIGHT	
 		sub ax,VELICINA_LOPTICE
-		sub ax, VELICINA_BLOKA_Y
+		sub ax, VISINA_PLATFORME 
 		sub ax,WINDOW_BOUNDS
 		CMP LOPTICA_Y,ax
 		jge PROVERA_X	
@@ -152,12 +146,12 @@ cseg segment 'CODE'
 		ret
 		
 		PROVERA_X:
-			MOV ax, BLOK_X
+			MOV ax, PLATFORMA_X
 			sub ax, VELICINA_LOPTICE
 			CMP ax, LOPTICA_X
 			JG KR
-			MOV ax, BLOK_X
-			ADD ax, VELICINA_BLOKA_X
+			MOV ax, PLATFORMA_X
+			ADD ax, SIRINA_PLATFORME
 			CMP AX, LOPTICA_X
 			JL KR
 			JMP NEG_VELOCITY_Y
@@ -173,15 +167,15 @@ cseg segment 'CODE'
 			neg BRZINA_LOPTICE_PO_Y   ;BRZINA_LOPTICE_PO_Y = - BRZINA_LOPTICE_PO_Y
 			ret
 		
-	POMJERI_LOPTU ENDP
+	POMERI_LOPTU ENDP
 	
 	POMERI_PLATFORMU PROC NEAR
 		
-		MOV ah, 01h
+		MOV ah, 01h  
 		INT 16h
 		jz EXIT_MV
 		
-		MOV ah, 00h
+		MOV ah, 00h  
 		INT 16h
 		
 		CMP ah, 4Bh
@@ -192,29 +186,36 @@ cseg segment 'CODE'
 		JMP EXIT_MV
 		
 		MOVE_BLOCK_LEFT:
-			MOV ax, BRZINA_PLATFORME
-			sub BLOK_X, ax
+			dec PLATFORMA_X
+			dec PLATFORMA_X
+			dec PLATFORMA_X
+			dec PLATFORMA_X
+			dec PLATFORMA_X
 			
-			CMP BLOK_X, 0h
+			CMP PLATFORMA_X, 0h
 			jl FIX_BLOCK_LEFT
 			JMP EXIT_MV
 			
 			FIX_BLOCK_LEFT:
-				MOV BLOK_X,0h
+				MOV PLATFORMA_X,0h
 				JMP EXIT_MV
 		
 		MOVE_BLOCK_RIGHT:
-			MOV ax, BRZINA_PLATFORME
-			add BLOK_X, ax
+			inc PLATFORMA_X
+			inc PLATFORMA_X
+			inc PLATFORMA_X
+			inc PLATFORMA_X
+			inc PLATFORMA_X
+			
 			MOV ax, WINDOW_WIDTH
 			sub ax, WINDOW_BOUNDS
-			sub ax, VELICINA_BLOKA_X
-			CMP BLOK_X, ax
+			sub ax, SIRINA_PLATFORME
+			CMP PLATFORMA_X, ax
 			jg FIX_BLOCK_RIGHT
 			JMP EXIT_MV
 			
 			FIX_BLOCK_RIGHT:
-				MOV BLOK_X, ax
+				MOV PLATFORMA_X, ax
 				JMP EXIT_MV
 		EXIT_MV:
 			ret
@@ -271,8 +272,8 @@ cseg segment 'CODE'
     ISCRTAJ_PLATFORMU PROC NEAR
 		
 		; U ovom kontekstu blok je platforma.
-        MOV cx,BLOK_X 
-        MOV dx,BLOK_Y 
+        MOV cx,PLATFORMA_X 
+        MOV dx,PLATFORMA_y 
 
         DRAW_BLOCK_HORIZONTAL:
             MOV ah,0Ch ; CONFIG
@@ -282,49 +283,49 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
-            CMP ax,VELICINA_BLOKA_X
+            sub ax,PLATFORMA_X ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
+            CMP ax,SIRINA_PLATFORME
             jng DRAW_BLOCK_HORIZONTAL
 
-            MOV cx,BLOK_X ; vrati cx na inicijalnu kolonu
+            MOV cx,PLATFORMA_X ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; dx - LOPTICA_Y > VELICINA_LOPTICE (ako jeste, iscrtali smo sve redove piksela; inace nastavljamo dalje)
-            sub ax,BLOK_Y
-            CMP ax,VELICINA_BLOKA_Y
+            sub ax,PLATFORMA_y
+            CMP ax,VISINA_PLATFORME 
             jng DRAW_BLOCK_HORIZONTAL
 
         ret
     ISCRTAJ_PLATFORMU ENDP
 	
 	NACRTAJ_1l_1 PROC NEAR
-		MOV cx,BLOK_X_1 ; postavi inicijalnu kolonu (X)
-        MOV dx,BLOK_Y_1; postavi inicijalni red (Y)
+		MOV cx,BLOK_KOLONA1 ; postavi inicijalnu kolonu (X)
+        MOV dx,BLOK_RED1; postavi inicijalni red (Y)
 		
-		CMP DESTRUKTOR_BLOKA_1_1, 0h;
+		CMP SUDAR_BLOK11, 0h;
 		
 		JE KRAJ_I_I
 			MOV ax, LOPTICA_X
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_X_1
+            CMP ax, BLOK_KOLONA1
             jng DRAW_UP_HORIZONTAL_I_I
 
-            MOV ax, BLOK_X_1
-            add ax, VELICINA_BLOKA_X_1
+            MOV ax, BLOK_KOLONA1
+            add ax, SIRINA_BLOKOVA
             CMP LOPTICA_X, ax
             jnl DRAW_UP_HORIZONTAL_I_I
 
             MOV ax, LOPTICA_Y
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_Y_1
+            CMP ax, BLOK_RED1
             jng DRAW_UP_HORIZONTAL_I_I
 
-            MOV ax, BLOK_Y_1
-            add ax, VELICINA_BLOKA_Y_1
+            MOV ax, BLOK_RED1
+            add ax, VISINA_BLOKOVA
             CMP LOPTICA_Y, ax
             jnl DRAW_UP_HORIZONTAL_I_I
 
-            MOV DESTRUKTOR_BLOKA_1_1, 0
+            MOV SUDAR_BLOK11, 0
             ret		
 		
 		DRAW_UP_HORIZONTAL_I_I:
@@ -335,16 +336,16 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X_1 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
-            CMP ax,VELICINA_BLOKA_X_1
+            sub ax,BLOK_KOLONA1 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
+            CMP ax,SIRINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_I_I
 
-            MOV cx,BLOK_X_1 ; vrati cx na inicijalnu kolonu
+            MOV cx,BLOK_KOLONA1 ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; dx - LOPTICA_Y > VELICINA_LOPTICE (ako jeste, iscrtali smo sve redove piksela; inace nastavljamo dalje)
-            sub ax,BLOK_Y_1
-            CMP ax,VELICINA_BLOKA_Y_1
+            sub ax,BLOK_RED1
+            CMP ax,VISINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_I_I
 			
 			KRAJ_I_I:
@@ -353,33 +354,33 @@ cseg segment 'CODE'
 	NACRTAJ_1l_1 ENDP
 	
 	NACRTAJ_1l_2 PROC NEAR
-		MOV cx,BLOK_X_2 ; postavi inicijalnu kolonu (X)
-        MOV dx,BLOK_Y_1; postavi inicijalni red (Y)
+		MOV cx,BLOK_KOLONA2 ; postavi inicijalnu kolonu (X)
+        MOV dx,BLOK_RED1; postavi inicijalni red (Y)
 		
-		CMP DESTRUKTOR_BLOKA_1_2, 0h;*
+		CMP SUDAR_BLOK12, 0h; 
 		
 		JE KRAJ_I_II
 			MOV ax, LOPTICA_X
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_X_2;*
-            jng DRAW_UP_HORIZONTAL_I_II;*
+            CMP ax, BLOK_KOLONA2; 
+            jng DRAW_UP_HORIZONTAL_I_II; 
 
-            MOV ax, BLOK_X_2;*
-            add ax, VELICINA_BLOKA_X_1
+            MOV ax, BLOK_KOLONA2; 
+            add ax, SIRINA_BLOKOVA
             CMP LOPTICA_X, ax
-            jnl DRAW_UP_HORIZONTAL_I_II;*
+            jnl DRAW_UP_HORIZONTAL_I_II; 
 
             MOV ax, LOPTICA_Y
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_Y_1;*
-            jng DRAW_UP_HORIZONTAL_I_II;*
+            CMP ax, BLOK_RED1; 
+            jng DRAW_UP_HORIZONTAL_I_II; 
 
-            MOV ax, BLOK_Y_1;*
-            add ax, VELICINA_BLOKA_Y_1
+            MOV ax, BLOK_RED1; 
+            add ax, VISINA_BLOKOVA
             CMP LOPTICA_Y, ax
-            jnl DRAW_UP_HORIZONTAL_I_II;*
+            jnl DRAW_UP_HORIZONTAL_I_II; 
 
-            MOV DESTRUKTOR_BLOKA_1_2, 0;*
+            MOV SUDAR_BLOK12, 0; 
             ret		
 		
 		DRAW_UP_HORIZONTAL_I_II:
@@ -390,16 +391,16 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X_2 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
-            CMP ax,VELICINA_BLOKA_X_1
+            sub ax,BLOK_KOLONA2 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
+            CMP ax,SIRINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_I_II
 
-            MOV cx,BLOK_X_2 ; vrati cx na inicijalnu kolonu
+            MOV cx,BLOK_KOLONA2 ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; dx - LOPTICA_Y > VELICINA_LOPTICE (ako jeste, iscrtali smo sve redove piksela; inace nastavljamo dalje)
-            sub ax,BLOK_Y_1
-            CMP ax,VELICINA_BLOKA_Y_1
+            sub ax,BLOK_RED1
+            CMP ax,VISINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_I_II
 			
 		KRAJ_I_II:
@@ -408,33 +409,33 @@ cseg segment 'CODE'
 	NACRTAJ_1l_2 ENDP
 	
 	NACRTAJ_1l_3 PROC NEAR
-		MOV cx,BLOK_X_3; postavi inicijalnu kolonu (X)
-        MOV dx,BLOK_Y_1; postavi inicijalni red (Y)
+		MOV cx,BLOK_KOLONA3; postavi inicijalnu kolonu (X)
+        MOV dx,BLOK_RED1; postavi inicijalni red (Y)
 		
-		CMP DESTRUKTOR_BLOKA_1_3, 0h;*
+		CMP SUDAR_BLOK13, 0h; 
 		
 		JE KRAJ_I_III
 			MOV ax, LOPTICA_X
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_X_3;*
-            jng DRAW_UP_HORIZONTAL_I_III;*
+            CMP ax, BLOK_KOLONA3; 
+            jng DRAW_UP_HORIZONTAL_I_III; 
 			
-            MOV ax, BLOK_X_3;*
-            add ax, VELICINA_BLOKA_X_1
+            MOV ax, BLOK_KOLONA3; 
+            add ax, SIRINA_BLOKOVA
             CMP LOPTICA_X, ax
-            jnl DRAW_UP_HORIZONTAL_I_III;*
+            jnl DRAW_UP_HORIZONTAL_I_III; 
 
             MOV ax, LOPTICA_Y
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_Y_1;*
-            jng DRAW_UP_HORIZONTAL_I_III;*
+            CMP ax, BLOK_RED1; 
+            jng DRAW_UP_HORIZONTAL_I_III; 
 
-            MOV ax, BLOK_Y_1;*
-            add ax, VELICINA_BLOKA_Y_1
+            MOV ax, BLOK_RED1; 
+            add ax, VISINA_BLOKOVA
             CMP LOPTICA_Y, ax
-            jnl DRAW_UP_HORIZONTAL_I_III;*
+            jnl DRAW_UP_HORIZONTAL_I_III; 
 
-            MOV DESTRUKTOR_BLOKA_1_3, 0;*
+            MOV SUDAR_BLOK13, 0; 
             ret
 		
 		DRAW_UP_HORIZONTAL_I_III:
@@ -445,49 +446,49 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X_3 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
-            CMP ax,VELICINA_BLOKA_X_1
+            sub ax,BLOK_KOLONA3 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
+            CMP ax,SIRINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_I_III
 
-            MOV cx,BLOK_X_3 ; vrati cx na inicijalnu kolonu
+            MOV cx,BLOK_KOLONA3 ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; dx - LOPTICA_Y > VELICINA_LOPTICE (ako jeste, iscrtali smo sve redove piksela; inace nastavljamo dalje)
-            sub ax,BLOK_Y_1
-            CMP ax,VELICINA_BLOKA_Y_1
+            sub ax,BLOK_RED1
+            CMP ax,VISINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_I_III
 		KRAJ_I_III:
 		ret
 	NACRTAJ_1l_3 ENDP
 	
 	NACRTAJ_1l_4 PROC NEAR
-		MOV cx,BLOK_X_4 ; postavi inicijalnu kolonu (X)
-        MOV dx,BLOK_Y_1; postavi inicijalni red (Y)
+		MOV cx,BLOK_KOLONA4 ; postavi inicijalnu kolonu (X)
+        MOV dx,BLOK_RED1; postavi inicijalni red (Y)
 		
-		CMP DESTRUKTOR_BLOKA_1_4, 0h;*
+		CMP SUDAR_BLOK14, 0h; 
 		
 		JE KRAJ_I_IV
 			MOV ax, LOPTICA_X
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_X_4;*
-            jng DRAW_UP_HORIZONTAL_I_IV;*
+            CMP ax, BLOK_KOLONA4; 
+            jng DRAW_UP_HORIZONTAL_I_IV; 
 
-            MOV ax, BLOK_X_4;*
-            add ax, VELICINA_BLOKA_X_1
+            MOV ax, BLOK_KOLONA4; 
+            add ax, SIRINA_BLOKOVA
             CMP LOPTICA_X, ax
-            jnl DRAW_UP_HORIZONTAL_I_IV;*
+            jnl DRAW_UP_HORIZONTAL_I_IV; 
 
             MOV ax, LOPTICA_Y
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_Y_1;*
-            jng DRAW_UP_HORIZONTAL_I_IV;*
+            CMP ax, BLOK_RED1; 
+            jng DRAW_UP_HORIZONTAL_I_IV; 
 
-            MOV ax, BLOK_Y_1;*
-            add ax, VELICINA_BLOKA_Y_1
+            MOV ax, BLOK_RED1; 
+            add ax, VISINA_BLOKOVA
             CMP LOPTICA_Y, ax
-            jnl DRAW_UP_HORIZONTAL_I_IV;*
+            jnl DRAW_UP_HORIZONTAL_I_IV; 
 
-            MOV DESTRUKTOR_BLOKA_1_4, 0;*
+            MOV SUDAR_BLOK14, 0; 
             ret
 		
 		DRAW_UP_HORIZONTAL_I_IV:
@@ -498,49 +499,49 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X_4 
-            CMP ax,VELICINA_BLOKA_X_1
+            sub ax,BLOK_KOLONA4 
+            CMP ax,SIRINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_I_IV
 
-            MOV cx,BLOK_X_4 ; vrati cx na inicijalnu kolonu
+            MOV cx,BLOK_KOLONA4 ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; 
-            sub ax,BLOK_Y_1
-            CMP ax,VELICINA_BLOKA_Y_1
+            sub ax,BLOK_RED1
+            CMP ax,VISINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_I_IV
 		KRAJ_I_IV:
 		ret
 	NACRTAJ_1l_4 ENDP
 	
 	NACRTAJ_2l_1 PROC NEAR
-		MOV cx,BLOK_X_1 ; postavi inicijalnu kolonu (X)
-        MOV dx,BLOK_Y_2; postavi inicijalni red (Y)
+		MOV cx,BLOK_KOLONA1 ; postavi inicijalnu kolonu (X)
+        MOV dx,BLOK_RED2; postavi inicijalni red (Y)
 		
-		CMP DESTRUKTOR_BLOKA_2_1, 0h;*
+		CMP SUDAR_BLOK21, 0h; 
 		
 		JE KRAJ_II_I
 			MOV ax, LOPTICA_X
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_X_1;*
-            jng DRAW_UP_HORIZONTAL_II_I;*
+            CMP ax, BLOK_KOLONA1; 
+            jng DRAW_UP_HORIZONTAL_II_I; 
 
-            MOV ax, BLOK_X_1;*
-            add ax, VELICINA_BLOKA_X_1
+            MOV ax, BLOK_KOLONA1; 
+            add ax, SIRINA_BLOKOVA
             CMP LOPTICA_X, ax
-            jnl DRAW_UP_HORIZONTAL_II_I;*
+            jnl DRAW_UP_HORIZONTAL_II_I; 
 
             MOV ax, LOPTICA_Y
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_Y_2;*
-            jng DRAW_UP_HORIZONTAL_II_I;*
+            CMP ax, BLOK_RED2; 
+            jng DRAW_UP_HORIZONTAL_II_I; 
 
-            MOV ax, BLOK_Y_2;*
-            add ax, VELICINA_BLOKA_Y_1
+            MOV ax, BLOK_RED2; 
+            add ax, VISINA_BLOKOVA
             CMP LOPTICA_Y, ax
-            jnl DRAW_UP_HORIZONTAL_II_I;*
+            jnl DRAW_UP_HORIZONTAL_II_I; 
 
-            MOV DESTRUKTOR_BLOKA_2_1, 0;*
+            MOV SUDAR_BLOK21, 0; 
             ret
 		
 		DRAW_UP_HORIZONTAL_II_I:
@@ -551,49 +552,49 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X_1 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
-            CMP ax,VELICINA_BLOKA_X_1
+            sub ax,BLOK_KOLONA1 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
+            CMP ax,SIRINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_II_I
 
-            MOV cx,BLOK_X_1 ; vrati cx na inicijalnu kolonu
+            MOV cx,BLOK_KOLONA1 ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; dx - LOPTICA_Y > VELICINA_LOPTICE (ako jeste, iscrtali smo sve redove piksela; inace nastavljamo dalje)
-            sub ax,BLOK_Y_2
-            CMP ax,VELICINA_BLOKA_Y_1
+            sub ax,BLOK_RED2
+            CMP ax,VISINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_II_I
 		KRAJ_II_I:
 		ret
 	NACRTAJ_2l_1 ENDP
 	
 	NACRTAJ_2l_2 PROC NEAR
-		MOV cx,BLOK_X_2 ; postavi inicijalnu kolonu (X)
-        MOV dx,BLOK_Y_2; postavi inicijalni red (Y)
+		MOV cx,BLOK_KOLONA2 ; postavi inicijalnu kolonu (X)
+        MOV dx,BLOK_RED2; postavi inicijalni red (Y)
 		
-		CMP DESTRUKTOR_BLOKA_2_2, 0h;*
+		CMP SUDAR_BLOK22, 0h; 
 		
 		JE KRAJ_II_II
 			MOV ax, LOPTICA_X
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_X_2;*
-            jng DRAW_UP_HORIZONTAL_II_II;*
+            CMP ax, BLOK_KOLONA2; 
+            jng DRAW_UP_HORIZONTAL_II_II; 
 
-            MOV ax, BLOK_X_2;*
-            add ax, VELICINA_BLOKA_X_1
+            MOV ax, BLOK_KOLONA2; 
+            add ax, SIRINA_BLOKOVA
             CMP LOPTICA_X, ax
-            jnl DRAW_UP_HORIZONTAL_II_II;*
+            jnl DRAW_UP_HORIZONTAL_II_II; 
 
             MOV ax, LOPTICA_Y
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_Y_2;*
-            jng DRAW_UP_HORIZONTAL_II_II;*
+            CMP ax, BLOK_RED2; 
+            jng DRAW_UP_HORIZONTAL_II_II; 
 
-            MOV ax, BLOK_Y_2;*
-            add ax, VELICINA_BLOKA_Y_1
+            MOV ax, BLOK_RED2; 
+            add ax, VISINA_BLOKOVA
             CMP LOPTICA_Y, ax
-            jnl DRAW_UP_HORIZONTAL_II_II;*
+            jnl DRAW_UP_HORIZONTAL_II_II; 
 
-            MOV DESTRUKTOR_BLOKA_2_2, 0;*
+            MOV SUDAR_BLOK22, 0; 
             ret
 		
 		DRAW_UP_HORIZONTAL_II_II:
@@ -604,49 +605,49 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X_2 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
-            CMP ax,VELICINA_BLOKA_X_1
+            sub ax,BLOK_KOLONA2 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
+            CMP ax,SIRINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_II_II
 
-            MOV cx,BLOK_X_2 ; vrati cx na inicijalnu kolonu
+            MOV cx,BLOK_KOLONA2 ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; dx - LOPTICA_Y > VELICINA_LOPTICE (ako jeste, iscrtali smo sve redove piksela; inace nastavljamo dalje)
-            sub ax,BLOK_Y_2
-            CMP ax,VELICINA_BLOKA_Y_1
+            sub ax,BLOK_RED2
+            CMP ax,VISINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_II_II
 		KRAJ_II_II:
 		ret
 	NACRTAJ_2l_2 ENDP
 	
 	NACRTAJ_2l_3 PROC NEAR
-		MOV cx,BLOK_X_3; postavi inicijalnu kolonu (X)
-        MOV dx,BLOK_Y_2; postavi inicijalni red (Y)
+		MOV cx,BLOK_KOLONA3; postavi inicijalnu kolonu (X)
+        MOV dx,BLOK_RED2; postavi inicijalni red (Y)
 		
-		CMP DESTRUKTOR_BLOKA_2_3, 0h;*
+		CMP SUDAR_BLOK23, 0h; 
 		
 		JE KRAJ_II_III
 			MOV ax, LOPTICA_X
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_X_3;*
-            jng DRAW_UP_HORIZONTAL_II_III;*
+            CMP ax, BLOK_KOLONA3; 
+            jng DRAW_UP_HORIZONTAL_II_III; 
 
-            MOV ax, BLOK_X_3;*
-            add ax, VELICINA_BLOKA_X_1
+            MOV ax, BLOK_KOLONA3; 
+            add ax, SIRINA_BLOKOVA
             CMP LOPTICA_X, ax
-            jnl DRAW_UP_HORIZONTAL_II_III;*
+            jnl DRAW_UP_HORIZONTAL_II_III; 
 
             MOV ax, LOPTICA_Y
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_Y_2;*
-            jng DRAW_UP_HORIZONTAL_II_III;*
+            CMP ax, BLOK_RED2; 
+            jng DRAW_UP_HORIZONTAL_II_III; 
 
-            MOV ax, BLOK_Y_2;*
-            add ax, VELICINA_BLOKA_Y_1
+            MOV ax, BLOK_RED2; 
+            add ax, VISINA_BLOKOVA
             CMP LOPTICA_Y, ax
-            jnl DRAW_UP_HORIZONTAL_II_III;*
+            jnl DRAW_UP_HORIZONTAL_II_III; 
 
-            MOV DESTRUKTOR_BLOKA_2_3, 0;*
+            MOV SUDAR_BLOK23, 0; 
             ret
 		
 		DRAW_UP_HORIZONTAL_II_III:
@@ -657,49 +658,49 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X_3 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
-            CMP ax,VELICINA_BLOKA_X_1
+            sub ax,BLOK_KOLONA3 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
+            CMP ax,SIRINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_II_III
 
-            MOV cx,BLOK_X_3 ; vrati cx na inicijalnu kolonu
+            MOV cx,BLOK_KOLONA3 ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; dx - LOPTICA_Y > VELICINA_LOPTICE (ako jeste, iscrtali smo sve redove piksela; inace nastavljamo dalje)
-            sub ax,BLOK_Y_2
-            CMP ax,VELICINA_BLOKA_Y_1
+            sub ax,BLOK_RED2
+            CMP ax,VISINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_II_III
 		KRAJ_II_III:
 		ret
 	NACRTAJ_2l_3 ENDP
 	
 	NACRTAJ_2_4 PROC NEAR
-		MOV cx,BLOK_X_4 ; postavi inicijalnu kolonu (X)
-        MOV dx,BLOK_Y_2; postavi inicijalni red (Y)
+		MOV cx,BLOK_KOLONA4 ; postavi inicijalnu kolonu (X)
+        MOV dx,BLOK_RED2; postavi inicijalni red (Y)
 		
-		CMP DESTRUKTOR_BLOKA_2_4, 0h;*
+		CMP SUDAR_BLOK24, 0h; 
 		
 		JE KRAJ_II_IV
 			MOV ax, LOPTICA_X
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_X_4;*
-            jng DRAW_UP_HORIZONTAL_II_IV;*
+            CMP ax, BLOK_KOLONA4; 
+            jng DRAW_UP_HORIZONTAL_II_IV; 
 
-            MOV ax, BLOK_X_4;*
-            add ax, VELICINA_BLOKA_X_1
+            MOV ax, BLOK_KOLONA4; 
+            add ax, SIRINA_BLOKOVA
             CMP LOPTICA_X, ax
-            jnl DRAW_UP_HORIZONTAL_II_IV;*
+            jnl DRAW_UP_HORIZONTAL_II_IV; 
 
             MOV ax, LOPTICA_Y
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_Y_2;*
-            jng DRAW_UP_HORIZONTAL_iI_IV;*
+            CMP ax, BLOK_RED2; 
+            jng DRAW_UP_HORIZONTAL_iI_IV; 
 
-            MOV ax, BLOK_Y_2;*
-            add ax, VELICINA_BLOKA_Y_1
+            MOV ax, BLOK_RED2; 
+            add ax, VISINA_BLOKOVA
             CMP LOPTICA_Y, ax
-            jnl DRAW_UP_HORIZONTAL_iI_IV;*
+            jnl DRAW_UP_HORIZONTAL_iI_IV; 
 
-            MOV DESTRUKTOR_BLOKA_2_4, 0;*
+            MOV SUDAR_BLOK24, 0; 
             ret
 		
 		DRAW_UP_HORIZONTAL_II_IV:
@@ -710,16 +711,16 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X_4 
-            CMP ax,VELICINA_BLOKA_X_1
+            sub ax,BLOK_KOLONA4 
+            CMP ax,SIRINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_II_IV
 
-            MOV cx,BLOK_X_4 ; vrati cx na inicijalnu kolonu
+            MOV cx,BLOK_KOLONA4 ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; 
-            sub ax,BLOK_Y_2
-            CMP ax,VELICINA_BLOKA_Y_1
+            sub ax,BLOK_RED2
+            CMP ax,VISINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_II_IV
 			
 		KRAJ_II_IV:
@@ -727,33 +728,33 @@ cseg segment 'CODE'
 	NACRTAJ_2_4 ENDP
 	
 	NACRTAJ_3l_1 PROC NEAR
-		MOV cx,BLOK_X_1 ; postavi inicijalnu kolonu (X)
-        MOV dx,BLOK_Y_3; postavi inicijalni red (Y)
+		MOV cx,BLOK_KOLONA1 ; postavi inicijalnu kolonu (X)
+        MOV dx,BLOK_RED3; postavi inicijalni red (Y)
 		
-		CMP DESTRUKTOR_BLOKA_3_1, 0h;
+		CMP SUDAR_BLOK31, 0h;
 		
 		JE KRAJ_III_I
 			MOV ax, LOPTICA_X
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_X_1
+            CMP ax, BLOK_KOLONA1
             jng DRAW_UP_HORIZONTAL_III_I
 
-            MOV ax, BLOK_X_1
-            add ax, VELICINA_BLOKA_X_1
+            MOV ax, BLOK_KOLONA1
+            add ax, SIRINA_BLOKOVA
             CMP LOPTICA_X, ax
             jnl DRAW_UP_HORIZONTAL_III_I
 
             MOV ax, LOPTICA_Y
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_Y_3
+            CMP ax, BLOK_RED3
             jng DRAW_UP_HORIZONTAL_III_I
 
-            MOV ax, BLOK_Y_3
-            add ax, VELICINA_BLOKA_Y_1
+            MOV ax, BLOK_RED3
+            add ax, VISINA_BLOKOVA
             CMP LOPTICA_Y, ax
             jnl DRAW_UP_HORIZONTAL_III_I
 
-            MOV DESTRUKTOR_BLOKA_3_1, 0
+            MOV SUDAR_BLOK31, 0
             ret		
 		
 		DRAW_UP_HORIZONTAL_III_I:
@@ -764,16 +765,16 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X_1 
-            CMP ax,VELICINA_BLOKA_X_1
+            sub ax,BLOK_KOLONA1 
+            CMP ax,SIRINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_III_I
 
-            MOV cx,BLOK_X_1 ; vrati cx na inicijalnu kolonu
+            MOV cx,BLOK_KOLONA1 ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; 
-            sub ax,BLOK_Y_3
-            CMP ax,VELICINA_BLOKA_Y_1
+            sub ax,BLOK_RED3
+            CMP ax,VISINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_III_I
 			
 		KRAJ_III_I:
@@ -782,33 +783,33 @@ cseg segment 'CODE'
 	NACRTAJ_3l_1 ENDP
 	
 	NACRTAJ_3l_2 PROC NEAR
-		MOV cx,BLOK_X_2 ; postavi inicijalnu kolonu (X)
-        MOV dx,BLOK_Y_3; postavi inicijalni red (Y)
+		MOV cx,BLOK_KOLONA2 ; postavi inicijalnu kolonu (X)
+        MOV dx,BLOK_RED3; postavi inicijalni red (Y)
 		
-		CMP DESTRUKTOR_BLOKA_3_2, 0h;*
+		CMP SUDAR_BLOK32, 0h; 
 		
 		JE KRAJ_III_II
 			MOV ax, LOPTICA_X
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_X_2;*
-            jng DRAW_UP_HORIZONTAL_III_II;*
+            CMP ax, BLOK_KOLONA2; 
+            jng DRAW_UP_HORIZONTAL_III_II; 
 
-            MOV ax, BLOK_X_2;*
-            add ax, VELICINA_BLOKA_X_1
+            MOV ax, BLOK_KOLONA2; 
+            add ax, SIRINA_BLOKOVA
             CMP LOPTICA_X, ax
-            jnl DRAW_UP_HORIZONTAL_III_II;*
+            jnl DRAW_UP_HORIZONTAL_III_II; 
 
             MOV ax, LOPTICA_Y
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_Y_3;*
-            jng DRAW_UP_HORIZONTAL_III_II;*
+            CMP ax, BLOK_RED3; 
+            jng DRAW_UP_HORIZONTAL_III_II; 
 
-            MOV ax, BLOK_Y_3;*
-            add ax, VELICINA_BLOKA_Y_1
+            MOV ax, BLOK_RED3; 
+            add ax, VISINA_BLOKOVA
             CMP LOPTICA_Y, ax
-            jnl DRAW_UP_HORIZONTAL_III_II;*
+            jnl DRAW_UP_HORIZONTAL_III_II; 
 
-            MOV DESTRUKTOR_BLOKA_3_2, 0;*
+            MOV SUDAR_BLOK32, 0; 
             ret		
 		
 		DRAW_UP_HORIZONTAL_III_II:
@@ -819,16 +820,16 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X_2 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
-            CMP ax,VELICINA_BLOKA_X_1
+            sub ax,BLOK_KOLONA2 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
+            CMP ax,SIRINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_III_II
 
-            MOV cx,BLOK_X_2 ; vrati cx na inicijalnu kolonu
+            MOV cx,BLOK_KOLONA2 ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; dx - LOPTICA_Y > VELICINA_LOPTICE (ako jeste, iscrtali smo sve redove piksela; inace nastavljamo dalje)
-            sub ax,BLOK_Y_3
-            CMP ax,VELICINA_BLOKA_Y_1
+            sub ax,BLOK_RED3
+            CMP ax,VISINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_III_II
 			
 		KRAJ_III_II:
@@ -837,33 +838,33 @@ cseg segment 'CODE'
 	NACRTAJ_3l_2 ENDP
 	
 	NACRTAJ_3l_3 PROC NEAR
-		MOV cx,BLOK_X_3; postavi inicijalnu kolonu (X)
-        MOV dx,BLOK_Y_3; postavi inicijalni red (Y)
+		MOV cx,BLOK_KOLONA3; postavi inicijalnu kolonu (X)
+        MOV dx,BLOK_RED3; postavi inicijalni red (Y)
 		
-		CMP DESTRUKTOR_BLOKA_3_3, 0h;*
+		CMP SUDAR_BLOK33, 0h; 
 		
 		JE KRAJ_III_III
 			MOV ax, LOPTICA_X
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_X_3;*
-            jng DRAW_UP_HORIZONTAL_III_III;*
+            CMP ax, BLOK_KOLONA3; 
+            jng DRAW_UP_HORIZONTAL_III_III; 
 
-            MOV ax, BLOK_X_3;*
-            add ax, VELICINA_BLOKA_X_1
+            MOV ax, BLOK_KOLONA3; 
+            add ax, SIRINA_BLOKOVA
             CMP LOPTICA_X, ax
-            jnl DRAW_UP_HORIZONTAL_III_III;*
+            jnl DRAW_UP_HORIZONTAL_III_III; 
 
             MOV ax, LOPTICA_Y
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_Y_3;*
-            jng DRAW_UP_HORIZONTAL_III_III;*
+            CMP ax, BLOK_RED3; 
+            jng DRAW_UP_HORIZONTAL_III_III; 
 
-            MOV ax, BLOK_Y_3;*
-            add ax, VELICINA_BLOKA_Y_1
+            MOV ax, BLOK_RED3; 
+            add ax, VISINA_BLOKOVA
             CMP LOPTICA_Y, ax
-            jnl DRAW_UP_HORIZONTAL_III_III;*
+            jnl DRAW_UP_HORIZONTAL_III_III; 
 
-            MOV DESTRUKTOR_BLOKA_3_3, 0;*
+            MOV SUDAR_BLOK33, 0; 
             ret
 		
 		DRAW_UP_HORIZONTAL_III_III:
@@ -874,49 +875,49 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X_3 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
-            CMP ax,VELICINA_BLOKA_X_1
+            sub ax,BLOK_KOLONA3 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
+            CMP ax,SIRINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_III_III
 
-            MOV cx,BLOK_X_3 ; vrati cx na inicijalnu kolonu
+            MOV cx,BLOK_KOLONA3 ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; dx - LOPTICA_Y > VELICINA_LOPTICE (ako jeste, iscrtali smo sve redove piksela; inace nastavljamo dalje)
-            sub ax,BLOK_Y_3
-            CMP ax,VELICINA_BLOKA_Y_1
+            sub ax,BLOK_RED3
+            CMP ax,VISINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_III_III
 		KRAJ_III_III:
 		ret
 	NACRTAJ_3l_3 ENDP
 	
 	NACRTAJ_3l_4 PROC NEAR
-		MOV cx,BLOK_X_4 ; postavi inicijalnu kolonu (X)
-        MOV dx,BLOK_Y_3; postavi inicijalni red (Y)
+		MOV cx,BLOK_KOLONA4 ; postavi inicijalnu kolonu (X)
+        MOV dx,BLOK_RED3; postavi inicijalni red (Y)
 		
-		CMP DESTRUKTOR_BLOKA_3_4, 0h;*
+		CMP SUDAR_BLOK34, 0h; 
 		
 		JE KRAJ_III_IV
 			MOV ax, LOPTICA_X
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_X_4;*
-            jng DRAW_UP_HORIZONTAL_III_IV;*
+            CMP ax, BLOK_KOLONA4; 
+            jng DRAW_UP_HORIZONTAL_III_IV; 
 
-            MOV ax, BLOK_X_4;*
-            add ax, VELICINA_BLOKA_X_1
+            MOV ax, BLOK_KOLONA4; 
+            add ax, SIRINA_BLOKOVA
             CMP LOPTICA_X, ax
-            jnl DRAW_UP_HORIZONTAL_III_IV;*
+            jnl DRAW_UP_HORIZONTAL_III_IV; 
 
             MOV ax, LOPTICA_Y
             add ax, VELICINA_LOPTICE
-            CMP ax, BLOK_Y_3;*
-            jng DRAW_UP_HORIZONTAL_III_IV;*
+            CMP ax, BLOK_RED3; 
+            jng DRAW_UP_HORIZONTAL_III_IV; 
 
-            MOV ax, BLOK_Y_3;*
-            add ax, VELICINA_BLOKA_Y_1
+            MOV ax, BLOK_RED3; 
+            add ax, VISINA_BLOKOVA
             CMP LOPTICA_Y, ax
-            jnl DRAW_UP_HORIZONTAL_III_IV;*
+            jnl DRAW_UP_HORIZONTAL_III_IV; 
 
-            MOV DESTRUKTOR_BLOKA_3_4, 0;*
+            MOV SUDAR_BLOK34, 0; 
             ret
 		
 		DRAW_UP_HORIZONTAL_III_IV:
@@ -927,16 +928,16 @@ cseg segment 'CODE'
 
             inc cx     ;cx = cx + 1
             MOV ax,cx
-            sub ax,BLOK_X_4 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
-            CMP ax,VELICINA_BLOKA_X_1
+            sub ax,BLOK_KOLONA4 ;cx - LOPTICA_X > VELICINA_LOPTICE (ako jeste, iscrtali smo za taj red sve kolone; inace nastavljamo dalje)
+            CMP ax,SIRINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_III_IV
 
-            MOV cx,BLOK_X_4 ; vrati cx na inicijalnu kolonu
+            MOV cx,BLOK_KOLONA4 ; vrati cx na inicijalnu kolonu
             inc dx        ; idemo u sledeci red
 
             MOV ax,dx    ; dx - LOPTICA_Y > VELICINA_LOPTICE (ako jeste, iscrtali smo sve redove piksela; inace nastavljamo dalje)
-            sub ax,BLOK_Y_3
-            CMP ax,VELICINA_BLOKA_Y_1
+            sub ax,BLOK_RED3
+            CMP ax,VISINA_BLOKOVA
             jng DRAW_UP_HORIZONTAL_III_IV
 		KRAJ_III_IV:
 		ret
@@ -962,7 +963,6 @@ kraj:   MOV ax, 4c00h
 		INT 10h; exit
         INT 21h
 
-end iscrtaj
-
 cseg     ends
 
+end iscrtaj
